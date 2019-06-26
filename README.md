@@ -1,6 +1,6 @@
 # This is a README file.
 
-$ Jerusalem
+# Jerusalem
 
 *And did those feet in ancient time*
 
