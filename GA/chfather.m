@@ -20,7 +20,7 @@ r = rand(20,1);   %r储存随机数，同时后续保存选择的染色体号
   %保存选择的新序列
   temp = V;
   for i = i:20
-    V(i) = temp{r(i)};
+    V{i} = temp{r(i)};
   end
 end
 

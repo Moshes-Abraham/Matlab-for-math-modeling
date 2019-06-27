@@ -22,7 +22,7 @@ v = cell(1,20);
 for i = 1:20
   temp1 = round(rand(1,33));   % 初始化染色体编码
   temp2 = vec2str(temp1);
-  v{1} = temp2;
+  v{i} = temp2;
 end
 clear temp1 temp2   % 记得清除之后无用的变量
 
@@ -44,7 +44,7 @@ for i = 1:n
 
   if (temp(1,1) > maxrec(1,1))   %保持最优值
     maxrec = temp;
-    mark = 1;
+    mark = i;  % another typo :'(
   end
 end
 
