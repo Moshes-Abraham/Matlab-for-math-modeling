@@ -1,3 +1,4 @@
 # Problem to solve
 
-![problem][data:~/matlab-for-math-modeling/GA/problem.jpg]
+![problem](https://github.com/Moshes-Abraham/matlab-for-math-modeling/GA/problem.jpg)
+![figure](https://github.com/Moshes-Abraham/matlab-for-math-modeling/GA/figure.jpg)
