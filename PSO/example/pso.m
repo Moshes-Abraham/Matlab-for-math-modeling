@@ -11,16 +11,16 @@
 %  something else ...
 
 %% The codes start  here
-function pso(N,M)
+function pso(M,N)
 
   % Initial settings
   % M = 20, popsize
   % N = 1000, max interactive times
   if ( nargin < 2 )
-    M = 20;
+    N = 1000;
   end
   if ( nargin < 1 )
-    N = 1000;
+    M = 20;
   end
 
   % set constant values
@@ -29,7 +29,7 @@ function pso(N,M)
   % Initial group
   P(:,1:2) = 200 * rand(M,2) - 100;   %第一二列为x1,x2
   P(:,3:4) = 6 * rand(M,2) - 3;   %第三四列为v1,v2
-  [g,pbest] = pb(P);   % g的第一列为f(x1,x2)的最小值，二三列为x1,x2, 即g为全局最优解．pbest的第一列为所有粒子的函数值，二三列为x1,x2
+  [g,pbest] = pb(P);   % g的第一列为f(x1,x2)的最�?值，二三列为x1,x2, �?�g为全局最优解．pbest的第一列为所有粒�?的函数值，二三列为x1,x2
 
   % Loop for result
   j = 0; % 迭代计数器
