@@ -1,8 +1,8 @@
 %% example-1
-x = [1:9];
+x = 1:9;
 y = [9 7 6 3 -1 2 5 7 20];
 
-p = polyfit(x,y,3)
+p = polyfit(x,y,3);
 
 xi = 0:.1:10;
 yi = polyval(p,xi);
