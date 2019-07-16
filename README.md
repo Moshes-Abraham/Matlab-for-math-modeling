@@ -1,5 +1,3 @@
-# This is a README file.
-
 # Jerusalem
 
 *And did those feet in ancient time*
