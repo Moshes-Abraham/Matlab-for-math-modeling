@@ -27,6 +27,8 @@ end
 
 c = zeros(30,1) + 1;
 X = [c,x'];
+
+% The loop is not efficient.
 B = inv(X'*X)*X'*y';
 
 for i = 1:30
