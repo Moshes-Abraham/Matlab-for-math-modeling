@@ -1,11 +1,14 @@
 #include <string>
 #include <iostream>
 #include <iterator>
+#include <cmath>
+#include <random>
 using namespace std;
 
 #include <Eigen/Eigen>
 #define LEN 33		// 33 bytes
-#define NUM 20		// 20 chromosomes
+
+#define NUM 20		/* 20 chromosomes */
 #define PI 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211704
 template<typename T>
 string toString(const T& t)
@@ -17,11 +20,11 @@ string toString(const T& t)
 
 class GA
 {
-	private:
-	//	int gen; 		// repeat times
-	//	string objFunc; // container for the objective function.
-		vector<string> v;	// group
-		Eigen::ArrayXXd record(NUM,1);
+	public:
+	//	int gen; 			// repeat times
+	//	string objFunc; 		// container for the objective function.
+		vector<string> v;		// group
+		Eigen::ArrayXd record{NUM};	// must init with "{}" not with "()", or it will recognized record as a function! 
 		Eigen::Array3d maxrec;
 		
 
@@ -36,22 +39,30 @@ class GA
 		string generateChromosome();
 
 		int bin2dec(string);
-	//	double objFunc(double, double);
 		void adapt(double (*)(double, double));
 		void maxrecord();
-		double bin_x();
+		double bin_x(string, char);
+		void chfather();		// choose father chromosom
+		void opcrossover();		// one point crossover
+
 		
+	//	double objFunc(double, double);
 };
 
 
 string GA::generateChromosome()
 {
-	Eigen::ArrayXd temp;
+	Eigen::ArrayXd temp{LEN};
 	string s;
-	
-	temp = temp.Random(LEN);
-	temp = temp.abs();
-	temp = round(temp);
+	std::random_device rd;		// generate real random numbers
+	for (int i = 0; i != LEN; ++i)	
+	{
+		temp(i) = std::round((rd() % 100) / (double)100);
+	}
+
+//	temp = temp.Random(LEN);	// fake random numbers
+//	temp = temp.abs();
+//	temp = round(temp);
 
 	for (short i = 0; i != LEN; ++i)
 	{
@@ -93,7 +104,7 @@ int GA::bin2dec(string s)
 }
 
 //Eigen::ArrayXXd GA::adapt(double (* objFunc)(double, double))
-void GA::adapt(double (* objFunc)(double, double))
+/*void GA::adapt(double (* objFunc)(double, double))	// my original method, runs well but not quite efficient
 {
 	string temp1; 
 	string tmp;
@@ -121,11 +132,28 @@ void GA::adapt(double (* objFunc)(double, double))
 			
 		}
 		// TODO: Use function pointer
-		record(i, 0) = (* objFunc)(bin2dec(temp2[i]),bin2dec(temp3[i]));
+		record(i, 0) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
 	}
+}*/
+// This is a more efficient way
+void GA::adapt(double (* objFunc)(double, double))
+{
+	string temp1; 
+	vector<string> temp2, temp3;
+	for (int i = 0; i != NUM; ++i)
+	{
+		for (int j = 0; j != NUM; ++j)
+		{
+			temp1 = v[j];
+			temp2.push_back(temp1.substr(0,18-1));	// stands for x1
+			temp3.push_back(temp1.substr(18));	// stands for x2
+		}
+		record(i, 0) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
+	}
+	
 }
 
-void maxrecord()
+void GA::maxrecord()
 {
 	Eigen::Array3d::Index i;	// Index of m
 	double m = record.maxCoeff(&i);
@@ -133,6 +161,92 @@ void maxrecord()
 	string temp1 = v[i];
 	string temp2 = temp1.substr(0,18-1);
 	string temp3 = temp1.substr(18);
-	maxrec(1) = bin_x(temp2,1);
-	maxrec(2) = bin_x(temp3,2);
+//	cout << endl << temp2 << "\t" << temp3 << endl << endl;	// test
+	maxrec(1) = bin_x(temp2,'1');
+	maxrec(2) = bin_x(temp3,'2');
+}
+
+double GA::bin_x(string bin, char opt)
+{
+	double num = 0.0;
+
+	switch (opt)
+	{
+		case '1':
+			return num = -3.0 + bin2dec(bin) * ((12.1 - (-3.0))/(pow(2,18) - 1));
+			break;
+		case '2':
+			return num = 4.1 + bin2dec(bin) * ((5.8 - 4.1)/(pow(2,15) - 1));
+			break;
+		default:
+			break;
+	}
+	return num;
+	
+}
+
+void GA::chfather()
+{ 
+	double F = 0.0;
+	int k;
+	vector<string> temp;
+	Eigen::ArrayXd pk{NUM};
+	Eigen::ArrayXd qk{NUM};
+	Eigen::ArrayXd r{NUM};
+	for (int i = 0; i != NUM; ++i)
+	{
+		F += record(i);		// the sun of all values in record
+	}
+	pk = record / F;
+	
+	qk = qk.LinSpaced(NUM,0,0); 
+	//qk(0) = pk(0);
+	for (int i = 0; i != NUM; ++i)
+	{
+		for (int j = 0; j <= i; ++j)
+		{
+			qk(i) += pk(j); 
+		}
+	}
+	// test
+//	cout << endl << qk << endl;
+
+	std::random_device rd;		// generate real random numbers
+	for (int i = 0; i != NUM; ++i)	
+	{
+		r(i) = (rd() % 100) / (double)100;
+	}
+	for (int i = 0; i != NUM; ++i)
+	{
+		k = 1;
+		while (r(i) > qk(k))
+		{
+			k += 1;
+		}
+		r(i) = k;
+	}
+	// test
+//	cout << endl << r << endl;
+
+	temp = v;
+	for (int i = 0; i != NUM; ++i)
+	{
+		v[i] = temp[r(i)];
+	}
+	// test
+//	for (auto &it : v)
+//		cout << it << endl;
+
+
+}
+
+void GA::opcrossover()
+{
+	Eigen::
+	const float pc = 0.25;
+	int l = 1;
+	while (l == 1)
+	{
+		r
+	}
 }

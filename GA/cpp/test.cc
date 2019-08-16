@@ -1,7 +1,8 @@
-//#include "GA.hpp"
+#include "GA.hpp"
 #include <cmath>
 #include <Eigen/Eigen>
 #include <iostream>
+#include <random>
 using namespace std;
 
 double MyobjFunc(double, double);
@@ -74,23 +75,32 @@ int main()
 //	
 //	cout << "record = " << endl;
 //	cout << record << endl;
-	//	GA g;
-	//	g.InitGroup();		// remember to Init or it'll cause segmentation fault
-	//	Eigen::ArrayXXd record(NUM,1);
-	//	record = g.adapt(MyobjFunc);
-	//	cout << record << endl;
-	Eigen::Array3d v(1,4212,23321), w(3,4,5);
+		GA g;
+		g.InitGroup();		// remember to Init or it'll cause segmentation fault
+		g.adapt(MyobjFunc);
+
+		cout << g.record << endl;
+
+		g.maxrecord();
+		cout << endl << g.maxrec << endl;
+		g.chfather();
+
+	//Eigen::Array3d v(1,4212,23321), w(3,4,5);
 	//std::cout << v.maxCoeff() << endl; 		// maxCoeff() returns the max value in an array
-	Eigen::Array3d::Index maxRow;
-	double max = v.maxCoeff(&maxRow);		// get the max value and its index (remember it starts from 0)
-	std :: cout << "Max: " << max << " at: " << maxRow << std :: endl;
-	std :: cout << v(2) << std :: endl;
+	//Eigen::Array3d::Index maxRow;
+	//double max = v.maxCoeff(&maxRow);		// get the max value and its index (remember it starts from 0)
+	//std :: cout << "Max: " << max << " at: " << maxRow << std :: endl;
+	//std :: cout << v(2) << std :: endl;
+		//	std::random_device myrd;
+		//	for (int i = 0; i != 10; ++i)
+		//		//std::cout << myrd() % 100 << std::endl;	// generate 10 real random numbers between 0 and 100
+		//		std::cout << ((myrd() % 100) /(double)100)<< std::endl;	// generate 10 real random numbers between 0 and 1. Remember (double) ! 
 
 }
 
 
-//double MyobjFunc(double x1, double x2)
-//{
-//	return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
-//	//return sin(x1) + sin(x2);
-//}
+double MyobjFunc(double x1, double x2)
+{
+	return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
+	//return sin(x1) + sin(x2);
+}
