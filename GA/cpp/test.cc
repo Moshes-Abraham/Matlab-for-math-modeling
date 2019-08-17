@@ -143,7 +143,9 @@ int main()
 		//		std::cout << ((myrd() % 100) /(double)100)<< std::endl;	// generate 10 real random numbers between 0 and 1. Remember (double) ! 
 	
 	// real test
-	GA g{1000,MyobjFunc};
+	int gen = 0;
+	std :: cin >> gen;
+	GA g{gen,MyobjFunc};
 	g.Solve();
 
 }
@@ -151,6 +153,7 @@ int main()
 
 double MyobjFunc(double x1, double x2)
 {
-	return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
+	//return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
 	//return sin(x1) + sin(x2);
+	return x1 * exp(-x1*x1 - x2*x2);
 }

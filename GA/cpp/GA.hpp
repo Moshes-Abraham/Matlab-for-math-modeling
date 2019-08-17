@@ -21,13 +21,13 @@ string toString(const T& t)
 class GA
 {
 	public:
-		GA(unsigned int n, double (*obj)(double, double)) : gen(n), objFunc(obj)
+		GA(int n, double (*obj)(double, double)) : gen(n), objFunc(obj)
 	{
 		InitGroup();
 	}
 
 	private:
-		unsigned int gen; 			// repeat times
+		int gen; 			// repeat times
 		double (*objFunc)(double, double); 		// container for the objective function.
 		vector<string> v;		// group
 		Eigen::ArrayXd record{NUM};	// must init with "{}" not with "()", or it will recognized record as a function! 
@@ -190,7 +190,8 @@ double GA::bin_x(string bin, char opt)
 			return num = -3.0 + bin2dec(bin) * ((12.1 - (-3.0))/(pow(2,18) - 1));
 			break;
 		case '2':
-			return num = 4.1 + bin2dec(bin) * ((5.8 - 4.1)/(pow(2,15) - 1));
+			//return num = 4.1 + bin2dec(bin) * ((5.8 - 4.1)/(pow(2,15) - 1));
+			return num = -3.0 + bin2dec(bin) * ((12.1 - (-3.0))/(pow(2,15) - 1));
 			break;
 		default:
 			break;
@@ -404,7 +405,7 @@ void GA::Solve()
 	cout << "               x2: " << maxrec(2) << endl;
 	cout << "         f(x1,x2): " << maxrec(0) << endl;
 	cout << "             from: " << mark << "(th) generation " << endl;
-	cout << "             time: " << t.format() << " s" << endl;
+	cout << "             time: " << t.format(6,"%w seconds") << endl;
 	cout << endl << "********************************************************" << endl;
 
 }
