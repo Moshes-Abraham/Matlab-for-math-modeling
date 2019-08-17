@@ -88,18 +88,22 @@ int main()
 	//	for (auto &it : a)
 	//		cout << it << endl;
 
-	//c	cout << g.record << endl;
-	//c	cout << endl;
-	//c      g.maxrecord();
-	//c      cout << endl << g.maxrec << endl << endl;
+		cout << g.record << endl;
+		cout << endl;
+	      g.maxrecord();
+	      cout << endl << g.maxrec << endl << endl;
+	      g.variation();
+	      g.adapt(MyobjFunc);
+	      g.maxrecord();
+	      cout << endl << g.record << endl << endl << g.maxrec << endl;
 
-	//c	g.opcrossover();
-	//c	g.adapt(MyobjFunc);
-	//c	cout << endl;
-	//c	cout << g.record << endl;
-	//c	cout << endl;
-	//c      g.maxrecord();
-	//c      cout << endl << g.maxrec << endl << endl;
+		g.opcrossover();
+		g.adapt(MyobjFunc);
+		cout << endl;
+		cout << g.record << endl;
+		cout << endl;
+	      g.maxrecord();
+	      cout << endl << g.maxrec << endl << endl;
 		
 			
 //	std::random_device rd;		// generate real random numbers

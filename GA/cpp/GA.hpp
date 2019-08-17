@@ -45,6 +45,8 @@ class GA
 		void chfather();		// choose father chromosom
 		void opcrossover();		// one point crossover
 		vector<string> onecross(string, string, int);
+		string vari(string, int);
+		void variation(); 		// variate operator
 
 		
 	//	double objFunc(double, double);
@@ -278,16 +280,18 @@ void GA::opcrossover()
 	cout << endl << mk << endl;
 
 	Eigen::ArrayXi r1{l/2};
-	int rt = 0;		// temp random number
+	//int rt = 0;		// temp random number
 	for (int i = 0; i != (l / 2); ++ i)
 	{
-		rt = ((rd() % 100) / (double)100 ) * (NUM - 1);
-		if (rt != 0) 
-		{
-			r1(i) = rt;
-		}
-		else
-			r1(i) = 1;
+		// TODO: change to 0 ~ 31
+	//	rt = ((rd() % 100) / (double)100 ) * (NUM - 1);
+	//	if (rt != 0) 
+	//	{
+	//		r1(r) = rt; 	// bug! it should be: r1(i) = rt;
+	//	}
+	//	else
+	//		r1(i) = 1;
+			r1(i) = ((rd() % 100) / (double)100 ) * (NUM - 1);
 	}
 
 	// test
@@ -303,11 +307,51 @@ void GA::opcrossover()
 
 vector<string> GA::onecross(string gene1, string gene2, int pos)
 {
-	int len = gene1.size();
+	//int len = gene1.size();
 	vector<string> s;
 	string g1 = gene1.substr(0,pos) + gene2.substr(pos);	// swap	
 	string g2 = gene2.substr(0,pos) + gene1.substr(pos);
 	s.push_back(g1);
 	s.push_back(g2);
 	return s;
+}
+
+string GA::vari(string gold, int pos)
+{
+	string gnew(gold);
+	if (gnew[pos] == '1')
+		gnew[pos] = '0';
+	else
+		gnew[pos] = '1';
+	return gnew;
+}
+
+void GA::variation()
+{
+	std::random_device rd;
+	Eigen::ArrayXd r{33};
+	Eigen::ArrayXi k{0};
+	const float pm = 0.01;
+	for (int i = 0; i != NUM; ++i)
+	{
+		for (int j = 0; j != LEN; ++j)
+		{
+			r(j) = (rd() % 100) / (double)100;
+		}
+
+		for (int j = 0, m = 0; j != LEN; ++j)
+		{
+			if (r(j) < pm)
+			{
+				k.conservativeResize(m + 1);
+				k(m) = j;
+				++m;
+			}
+		}
+		
+		for (int j = 0; j != k.rows(); ++j)
+		{
+			v[i] = vari(v[i], k(j));
+		}
+	}
 }
