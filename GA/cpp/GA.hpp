@@ -6,7 +6,7 @@
 using namespace std;
 
 #include <Eigen/Eigen>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #define LEN 33		// 33 bytes
 #define NUM 20		/* 20 chromosomes */
 #define PI 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211704
@@ -369,12 +369,14 @@ void GA::variation()
 
 void GA::Solve()
 {
+	boost::timer::cpu_timer t;
 	Eigen::Array3d temp;
 	int mark = 0;
 
 	adapt();
 	maxrec = maxrecord();
 
+	t.start();
 	for (int i = 0; i != gen; ++i)
 	{
 		chfather();		// chose father chromosome
@@ -393,13 +395,16 @@ void GA::Solve()
 		}
 
 	}
+	t.stop();
 
 	// outputs
 	cout << endl << "********************************************************" << endl << endl;
+	cout << "  REPORT:          " << endl;
 	cout << "               x1: " << maxrec(1) << endl;
 	cout << "               x2: " << maxrec(2) << endl;
 	cout << "         f(x1,x2): " << maxrec(0) << endl;
 	cout << "             from: " << mark << "(th) generation " << endl;
+	cout << "             time: " << t.format() << " s" << endl;
 	cout << endl << "********************************************************" << endl;
 
 }
