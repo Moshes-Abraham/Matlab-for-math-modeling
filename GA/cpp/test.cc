@@ -78,13 +78,55 @@ int main()
 		GA g;
 		g.InitGroup();		// remember to Init or it'll cause segmentation fault
 		g.adapt(MyobjFunc);
+		cout << endl;
+	//	for (auto &it : g.v)
+	//		cout << it << endl;
 
-		cout << g.record << endl;
+	//	vector<string> a;
+	//	a = g.onecross(g.v[0],g.v[1],4);
+	//	cout << endl;
+	//	for (auto &it : a)
+	//		cout << it << endl;
 
-		g.maxrecord();
-		cout << endl << g.maxrec << endl;
-		g.chfather();
+	//c	cout << g.record << endl;
+	//c	cout << endl;
+	//c      g.maxrecord();
+	//c      cout << endl << g.maxrec << endl << endl;
 
+	//c	g.opcrossover();
+	//c	g.adapt(MyobjFunc);
+	//c	cout << endl;
+	//c	cout << g.record << endl;
+	//c	cout << endl;
+	//c      g.maxrecord();
+	//c      cout << endl << g.maxrec << endl << endl;
+		
+			
+//	std::random_device rd;		// generate real random numbers
+//	Eigen::ArrayXd r{NUM};
+//	Eigen::ArrayXi mk{0};
+//	const float pc = 0.25;
+//	int l = 1;
+//	while (l == 1)
+//	{
+//	      for (int i = 0; i != NUM; ++i)	
+//	      {
+//	      	r(i) = (rd() % 100) / (double)100;
+//	      }
+//
+//		for (int i = 0, j = 0; i != NUM; ++i)
+//		{
+//			if (r(i) < pc)
+//			{
+//				mk.conservativeResize(j + 1);
+//				mk(j) = i;
+//				++j;
+//			}
+//		}
+//		l = mk.rows();
+//	}
+//
+//		cout << l << endl << mk << endl;
 	//Eigen::Array3d v(1,4212,23321), w(3,4,5);
 	//std::cout << v.maxCoeff() << endl; 		// maxCoeff() returns the max value in an array
 	//Eigen::Array3d::Index maxRow;

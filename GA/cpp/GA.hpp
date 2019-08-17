@@ -44,6 +44,7 @@ class GA
 		double bin_x(string, char);
 		void chfather();		// choose father chromosom
 		void opcrossover();		// one point crossover
+		vector<string> onecross(string, string, int);
 
 		
 	//	double objFunc(double, double);
@@ -242,11 +243,71 @@ void GA::chfather()
 
 void GA::opcrossover()
 {
-	Eigen::
+	vector<string> g;
+	std::random_device rd;		// generate real random numbers
+	Eigen::ArrayXd r{NUM};
+	Eigen::ArrayXi mk{0};
 	const float pc = 0.25;
 	int l = 1;
 	while (l == 1)
 	{
-		r
+		for (int i = 0; i != NUM; ++i)	
+		{
+			r(i) = (rd() % 100) / (double)100;
+		}
+		for (int i = 0, j = 0; i != NUM; ++i)
+		{
+			if (r(i) < pc)
+			{
+				mk.conservativeResize(j + 1);
+				mk(j) = i;
+				++j;
+			}
+		}
+		l = mk.rows();
 	}
+	// test
+//	cout << l << endl << mk << endl;
+
+	if (l % 2 == 1)
+	{
+		mk.conservativeResize(l - 1);
+		l -= 1;
+	}
+	// test
+	cout << endl << mk << endl;
+
+	Eigen::ArrayXi r1{l/2};
+	int rt = 0;		// temp random number
+	for (int i = 0; i != (l / 2); ++ i)
+	{
+		rt = ((rd() % 100) / (double)100 ) * (NUM - 1);
+		if (rt != 0) 
+		{
+			r1(i) = rt;
+		}
+		else
+			r1(i) = 1;
+	}
+
+	// test
+//	cout << endl << r1 << endl;
+
+	for (int i = 0; i != (l / 2); ++i)
+	{
+		g = onecross(v[mk(2 * i)], v[mk(2 * i + 1)], r1(i));
+		v[mk(2 * i)] = g[0];
+		v[mk(2 * i + 1)] = g[1];
+	}
+}
+
+vector<string> GA::onecross(string gene1, string gene2, int pos)
+{
+	int len = gene1.size();
+	vector<string> s;
+	string g1 = gene1.substr(0,pos) + gene2.substr(pos);	// swap	
+	string g2 = gene2.substr(0,pos) + gene1.substr(pos);
+	s.push_back(g1);
+	s.push_back(g2);
+	return s;
 }
