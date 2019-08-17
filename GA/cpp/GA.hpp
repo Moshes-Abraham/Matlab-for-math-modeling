@@ -6,8 +6,8 @@
 using namespace std;
 
 #include <Eigen/Eigen>
+#include <boost/timer.hpp>
 #define LEN 33		// 33 bytes
-
 #define NUM 20		/* 20 chromosomes */
 #define PI 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211704
 template<typename T>
@@ -21,14 +21,23 @@ string toString(const T& t)
 class GA
 {
 	public:
-	//	int gen; 			// repeat times
-	//	string objFunc; 		// container for the objective function.
+		GA(unsigned int n, double (*obj)(double, double)) : gen(n), objFunc(obj)
+	{
+		InitGroup();
+	}
+
+	private:
+		unsigned int gen; 			// repeat times
+		double (*objFunc)(double, double); 		// container for the objective function.
 		vector<string> v;		// group
 		Eigen::ArrayXd record{NUM};	// must init with "{}" not with "()", or it will recognized record as a function! 
 		Eigen::Array3d maxrec;
 		
 
 	public:
+		void Solve();			// solve the problem
+
+
 	//	GA(string func, int n) :objFunc(func), gen(n)
 	//	{
 	//		
@@ -39,8 +48,8 @@ class GA
 		string generateChromosome();
 
 		int bin2dec(string);
-		void adapt(double (*)(double, double));
-		void maxrecord();
+		void adapt();
+		Eigen::Array3d maxrecord();
 		double bin_x(string, char);
 		void chfather();		// choose father chromosom
 		void opcrossover();		// one point crossover
@@ -139,7 +148,7 @@ int GA::bin2dec(string s)
 	}
 }*/
 // This is a more efficient way
-void GA::adapt(double (* objFunc)(double, double))
+void GA::adapt()
 {
 	string temp1; 
 	vector<string> temp2, temp3;
@@ -156,17 +165,19 @@ void GA::adapt(double (* objFunc)(double, double))
 	
 }
 
-void GA::maxrecord()
+Eigen::Array3d GA::maxrecord()
 {
+	Eigen::Array3d max;
 	Eigen::Array3d::Index i;	// Index of m
 	double m = record.maxCoeff(&i);
-	maxrec(0) = m;
+	max(0) = m;
 	string temp1 = v[i];
 	string temp2 = temp1.substr(0,18-1);
 	string temp3 = temp1.substr(18);
 //	cout << endl << temp2 << "\t" << temp3 << endl << endl;	// test
-	maxrec(1) = bin_x(temp2,'1');
-	maxrec(2) = bin_x(temp3,'2');
+	max(1) = bin_x(temp2,'1');
+	max(2) = bin_x(temp3,'2');
+	return max;
 }
 
 double GA::bin_x(string bin, char opt)
@@ -277,7 +288,7 @@ void GA::opcrossover()
 		l -= 1;
 	}
 	// test
-	cout << endl << mk << endl;
+//	cout << endl << mk << endl;
 
 	Eigen::ArrayXi r1{l/2};
 	//int rt = 0;		// temp random number
@@ -354,4 +365,41 @@ void GA::variation()
 			v[i] = vari(v[i], k(j));
 		}
 	}
+}
+
+void GA::Solve()
+{
+	Eigen::Array3d temp;
+	int mark = 0;
+
+	adapt();
+	maxrec = maxrecord();
+
+	for (int i = 0; i != gen; ++i)
+	{
+		chfather();		// chose father chromosome
+
+		// genetic operator
+		opcrossover();
+		variation();
+
+		adapt();
+		temp = maxrecord();
+
+		if (temp(0) > maxrec(0))	// keep the best value
+		{
+			maxrec = temp;
+			mark = i;
+		}
+
+	}
+
+	// outputs
+	cout << endl << "********************************************************" << endl << endl;
+	cout << "               x1: " << maxrec(1) << endl;
+	cout << "               x2: " << maxrec(2) << endl;
+	cout << "         f(x1,x2): " << maxrec(0) << endl;
+	cout << "             from: " << mark << "(th) generation " << endl;
+	cout << endl << "********************************************************" << endl;
+
 }

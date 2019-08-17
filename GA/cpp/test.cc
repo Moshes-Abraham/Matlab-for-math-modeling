@@ -75,10 +75,10 @@ int main()
 //	
 //	cout << "record = " << endl;
 //	cout << record << endl;
-		GA g;
-		g.InitGroup();		// remember to Init or it'll cause segmentation fault
-		g.adapt(MyobjFunc);
-		cout << endl;
+//		GA g;
+//		g.InitGroup();		// remember to Init or it'll cause segmentation fault
+//		g.adapt(MyobjFunc);
+//		cout << endl;
 	//	for (auto &it : g.v)
 	//		cout << it << endl;
 
@@ -88,22 +88,22 @@ int main()
 	//	for (auto &it : a)
 	//		cout << it << endl;
 
-		cout << g.record << endl;
-		cout << endl;
-	      g.maxrecord();
-	      cout << endl << g.maxrec << endl << endl;
-	      g.variation();
-	      g.adapt(MyobjFunc);
-	      g.maxrecord();
-	      cout << endl << g.record << endl << endl << g.maxrec << endl;
-
-		g.opcrossover();
-		g.adapt(MyobjFunc);
-		cout << endl;
-		cout << g.record << endl;
-		cout << endl;
-	      g.maxrecord();
-	      cout << endl << g.maxrec << endl << endl;
+//		cout << g.record << endl;
+//		cout << endl;
+//	      g.maxrecord();
+//	      cout << endl << g.maxrec << endl << endl;
+//	      g.variation();
+//	      g.adapt(MyobjFunc);
+//	      g.maxrecord();
+//	      cout << endl << g.record << endl << endl << g.maxrec << endl;
+//
+//		g.opcrossover();
+//		g.adapt(MyobjFunc);
+//		cout << endl;
+//		cout << g.record << endl;
+//		cout << endl;
+//	      g.maxrecord();
+//	      cout << endl << g.maxrec << endl << endl;
 		
 			
 //	std::random_device rd;		// generate real random numbers
@@ -141,6 +141,10 @@ int main()
 		//	for (int i = 0; i != 10; ++i)
 		//		//std::cout << myrd() % 100 << std::endl;	// generate 10 real random numbers between 0 and 100
 		//		std::cout << ((myrd() % 100) /(double)100)<< std::endl;	// generate 10 real random numbers between 0 and 1. Remember (double) ! 
+	
+	// real test
+	GA g{1000,MyobjFunc};
+	g.Solve();
 
 }
 
