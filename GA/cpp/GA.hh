@@ -192,25 +192,28 @@ void GA::adapt()
 				if (segment != dimension)
 				{
 					tmp.push_back(temp1.substr(breakPointPosPrev,breakPointPos - 1));
-					input.push_back(tmp);
-					tmp.clear();
+					//input.push_back(tmp);
+					//tmp.clear();
 				}
 				else
 				{
 					tmp.push_back(temp1.substr(breakPointPos));
-					input.push_back(tmp);
-					tmp.clear();
+					//input.push_back(tmp);
+					//tmp.clear();
 				}
 				segment += 1;
 				breakPointPosPrev = breakPointPos;
 				breakPointPos += breakPointStep;
 			}
+			input.push_back(tmp);
+			tmp.clear();
 			//temp2.push_back(temp1.substr(0,breakPointPos - 1));	// stands for x1
 			//temp3.push_back(temp1.substr(breakPointPos));	// stands for x2
 		}
+
+
 	//	record(i) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
-		record(i) = (* objFunc)(bin_x(input));
-		input.clear();
+		record(i) = (* objFunc)(bin_x(input[i]));
 	}
 	
 }
@@ -230,16 +233,15 @@ Eigen::Array3d GA::maxrecord()
 	return max;
 }
 
-vector<double> GA::bin_x(vector<vector<string> > inp)
+vector<double> GA::bin_x(vector<string> s)
 {
 	double num = 0.0;
 	vector<double> ret;
 	vector<string> s;
 	for (int i = 0; i != dimension; ++i)
 	{
-		s = inp[i];
 		num = range(i,0) + bin2dec(s[0])  
-		ret.push_back();
+		ret.push_back(range(i,0) + bin2dec(s[i]) * );
 	}
 //	double num = 0.0;
 //
