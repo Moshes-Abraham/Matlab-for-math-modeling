@@ -144,9 +144,27 @@ int main()
 	
 	// real test
 	int gen = 0;
-	std :: cin >> gen;
-	GA g{gen,MyobjFunc};
+	GA g{10000,MyobjFunc};
+	g.setRange(-3.0,12.1,-3.0,12.1);
+	g.setChromosomeLength(44);
+	g.setChromosomeBreakPoint(22);
+	g.setChromosomeNumber(30);	// Error! 
+	g.setCrossOverPossibility(0.2l);
+	g.setVariationPossibility(0.3);
 	g.Solve();
+	//	GA g{100,MyobjFunc};
+//		g.InitGroup();
+//		for (auto &it : g.v)
+//			cout << it << endl;
+//		g.adapt();
+//		Eigen::Array3d temp;
+//		g.maxrec = g.maxrecord();
+//		g.chfather();
+//		g.opcrossover();
+//		g.variation();
+//		for (auto &it : g.v)
+//			cout << it << endl;
+	//	cout << endl << g.record << endl;
 
 }
 
@@ -156,4 +174,5 @@ double MyobjFunc(double x1, double x2)
 	//return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
 	//return sin(x1) + sin(x2);
 	return x1 * exp(-x1*x1 - x2*x2);
+	//return sqrt(x1*x1+x2*x2);
 }
