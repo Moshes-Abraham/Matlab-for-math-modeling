@@ -1,11 +1,12 @@
-#include "GA.hpp"
+#include "GA.hh"
 #include <cmath>
 #include <Eigen/Eigen>
 #include <iostream>
 #include <random>
 using namespace std;
 
-double MyobjFunc(double, double);
+double MyobjFunc(vector<double>);
+double MyobjFunc2(vector<double>);
 int main()
 {
 //	Eigen::ArrayXd temp;
@@ -143,14 +144,19 @@ int main()
 		//		std::cout << ((myrd() % 100) /(double)100)<< std::endl;	// generate 10 real random numbers between 0 and 1. Remember (double) ! 
 	
 	// real test
-	int gen = 0;
-	GA g{10000,MyobjFunc2};
-	g.setRange(-3.0,12.1,-3.0,12.1);
-	g.setChromosomeLength(44);
-	g.setChromosomeBreakPoint(22);
-	g.setChromosomeNumber(30);	// Error! 
-	g.setCrossOverPossibility(0.2l);
-	g.setVariationPossibility(0.3);
+	//int gen = 0;
+	int dim = 3;			// dimension of the obj function
+	GA g{2000,MyobjFunc2,dim};	// init with times of iteration, obj function and dimension of the obj function
+	Eigen::ArrayX2d r{dim,2};
+	r <<	-3.0, 12.1,		// range of x1
+		4.1, 5.8,		// range of x2
+		2.1, 6.7;		// range of x3
+
+	g.setRange(r);
+	g.setChromosomeLength(43);
+	g.setChromosomeNumber(10);	// Error! 
+	g.setCrossOverPossibility(0.61);
+	g.setVariationPossibility(0.31);
 	g.Solve();
 	//	GA g{100,MyobjFunc};
 //		g.InitGroup();
@@ -169,15 +175,16 @@ int main()
 }
 
 
-double MyobjFunc(double x1, double x2)
+double MyobjFunc(vector<double> x)
 {
-	//return 21.5 + x1 * sin (4 * PI * x1) + x2 * sin(20 * PI * x2);
-	//return sin(x1) + sin(x2);
-	return x1 * exp(-x1*x1 - x2*x2);
-	//return sqrt(x1*x1+x2*x2);
+	return 21.5 + x[0] * sin (4 * PI * x[0]) + x[1] * sin(20 * PI * x[1]);
+//	//return sin(x1) + sin(x2);
+//	return x1 * exp(-x1*x1 - x2*x2);
+//	//return sqrt(x1*x1+x2*x2);
 }
 
 double MyobjFunc2(vector<double> x) 		// A genius idea!
 {
-	return x[0] * exp(-x[0]*x[0] - x[1]*x[1]);
+	//return x[0] * exp(-x[0]*x[0] - x[1]*x[1] - x[1]*x[1]);
+	return 21.5 + x[0] * sin (4 * PI * x[0]) + x[1] * sin(20 * PI * x[1]) - x[2] * sin(6 * PI * x[2]);
 }

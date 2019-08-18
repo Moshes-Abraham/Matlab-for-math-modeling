@@ -21,7 +21,7 @@ string toString(const T& t)
 class GA
 {
 	public:
-		GA(int n, double (*obj)(vector<double>)) : gen(n), objFunc(obj)
+		GA(int n, double (*obj)(vector<double>), int dim) : gen(n), objFunc(obj), dimension(dim)
 	{
 //		InitGroup();
 	}
@@ -45,8 +45,8 @@ class GA
 
 		int bin2dec(string);
 		void adapt();
-		Eigen::Array3d maxrecord();
-		double bin_x(string, char);
+		Eigen::ArrayXd maxrecord();
+		vector<double> bin_x(vector<string>);
 		void chfather();		// choose father chromosom
 		void opcrossover();		// one point crossover
 		vector<string> onecross(string, string, int);
@@ -62,26 +62,29 @@ class GA
 		//void setChromosomeBreakPoint(){breakPointPos = (chromosomeLEN / dimension)}
 		void setCrossOverPossibility(double op){pc = op;}
 		void setVariationPossibility(double vp){pm = vp;}
+		void setBreakPoint();
 
 		
 	//	double objFunc(double, double);
 	private:
 		int gen; 			// repeat times
-		int dimension = 2;		// 2 by default
+		int dimension;		// 2 by default
 		//vector<double> input;
 		double (*objFunc)(vector<double>); 		// container for the objective function.
 		vector<string> v;		// group
-		Eigen::ArrayXd record{0};	// must init with "{}" not with "()", or it will recognized record as a function! 
-		Eigen::Array3d maxrec;
+		Eigen::ArrayXd record{chromosomeLEN};	// must init with "{}" not with "()", or it will recognized record as a function! 
+		Eigen::ArrayXd maxrec;
 
 		//double x1begin = -3.0, x1end = 3.0, x2begin = -3.0, x2end = 3.0;
-		Eigen::ArrayX2d range{dimension};
-		int chromosomeLEN = 33;
+		Eigen::ArrayX2d range{dimension,2};
+		int chromosomeLEN = 33;		// by default
 		int chromosomeNUM = 20;
-		int breakPointStep = std::round(chromosomeLEN / dimension);
-		int breakPointPos = breakPointStep;
-		int breakPointPosPrev = 0;
+
+		int breakPointStep; 	//= std::round(chromosomeLEN / dimension);
+		vector<int> breakPointPos;
+//		vector<int> breakPointPosPrev;
 		//int breakPointNUM = dimension - 1;
+		
 		double pm = 0.01;
 		double pc = 0.25;
 };
@@ -175,36 +178,38 @@ int GA::bin2dec(string s)
 // This is a more efficient way
 void GA::adapt()
 {
-	record.conservativeResize(chromosomeNUM);
+	//record.conservativeResize(chromosomeNUM);
 	string temp1; 
 //	vector<string> temp2, temp3;
 	vector<vector<string> > input;
 	vector<string> tmp;
 	int segment = 1;
+	int pos = 0;
 
 	for (int i = 0; i != chromosomeNUM; ++i)
 	{
 		for (int j = 0; j != chromosomeNUM; ++j)
 		{
 			temp1 = v[j];
-			for (int k = 0; k != demension; ++k)
+			for (int k = 0; k != dimension; ++k)
 			{
 				if (segment != dimension)
 				{
-					tmp.push_back(temp1.substr(breakPointPosPrev,breakPointPos - 1));
+					tmp.push_back(temp1.substr(breakPointPos[pos],breakPointStep));
+					pos += 1;
 					//input.push_back(tmp);
 					//tmp.clear();
 				}
 				else
 				{
-					tmp.push_back(temp1.substr(breakPointPos));
+					tmp.push_back(temp1.substr(breakPointPos[pos]));
 					//input.push_back(tmp);
 					//tmp.clear();
 				}
 				segment += 1;
-				breakPointPosPrev = breakPointPos;
-				breakPointPos += breakPointStep;
 			}
+			segment = 0;
+			pos = 0;
 			input.push_back(tmp);
 			tmp.clear();
 			//temp2.push_back(temp1.substr(0,breakPointPos - 1));	// stands for x1
@@ -213,36 +218,74 @@ void GA::adapt()
 
 
 	//	record(i) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
+	//	double d = (* objFunc)(bin_x(input[i]));
+	//	cout << "d = " << d << endl;
+	//	cout << "record: " << record(i) << endl;
+	//	record(i) = d;
 		record(i) = (* objFunc)(bin_x(input[i]));
 	}
 	
 }
 
-Eigen::Array3d GA::maxrecord()
+Eigen::ArrayXd GA::maxrecord()
 {
-	Eigen::Array3d max;
-	Eigen::Array3d::Index i;	// Index of m
+	Eigen::ArrayXd max{dimension + 1};
+	Eigen::ArrayXd::Index i;	// Index of m
 	double m = record.maxCoeff(&i);
 	max(0) = m;
 	string temp1 = v[i];
-	string temp2 = temp1.substr(0,breakPointPos - 1);
-	string temp3 = temp1.substr(breakPointPos);
-//	cout << endl << temp2 << "\t" << temp3 << endl << endl;	// test
-	max(1) = bin_x(temp2,'1');
-	max(2) = bin_x(temp3,'2');
+	vector<string> tmp;
+	vector<double> b_x;
+	int segment = 1;
+	int pos = 0;
+
+	for (int k = 0; k != dimension; ++k)
+	{
+		if (segment != dimension)
+		{
+			tmp.push_back(temp1.substr(breakPointPos[pos],breakPointStep));
+			pos += 1;
+			//input.push_back(tmp);
+			//tmp.clear();
+		}
+		else
+		{
+			tmp.push_back(temp1.substr(breakPointPos[pos]));
+			//input.push_back(tmp);
+			//tmp.clear();
+		}
+		segment += 1;
+	}
+	b_x = bin_x(tmp);
+	
+	for (int i = 1, j = 0; i <= dimension; ++i, ++j)
+	{
+		max(i) = b_x[j];
+	}
+
+//	string temp2 = temp1.substr(0,breakPointPos - 1);
+//	string temp3 = temp1.substr(breakPointPos);
+////	cout << endl << temp2 << "\t" << temp3 << endl << endl;	// test
+//	max(1) = bin_x(temp2,'1');
+//	max(2) = bin_x(temp3,'2');
 	return max;
 }
 
 vector<double> GA::bin_x(vector<string> s)
 {
-	double num = 0.0;
+	//double num = 0.0;
 	vector<double> ret;
-	vector<string> s;
+	//vector<string> s;
 	for (int i = 0; i != dimension; ++i)
 	{
-		num = range(i,0) + bin2dec(s[0])  
-		ret.push_back(range(i,0) + bin2dec(s[i]) * );
+		if (i == (dimension - 1))
+			ret.push_back(range(i,0) + bin2dec(s[i]) * ((range(i,1) - range(i,0))/(pow(2,s[i].size()) - 1)));
+		else
+			ret.push_back(range(i,0) + bin2dec(s[i]) * ((range(i,1) - range(i,0))/(pow(2,breakPointStep) - 1)));
 	}
+
+	return ret;
+
 //	double num = 0.0;
 //
 //	switch (opt)
@@ -331,7 +374,7 @@ void GA::opcrossover()
 		{
 			r(i) = (rd() % 100) / (double)100;
 		}
-		for (int i = 0, j = 0; i != chromosomeNUM; ++i)	// ATTENTION! chromosomeNUM should not larger than chromosomeLEN, or mk may larger than chromosomeLEN and causr "std::out_of_ranger"
+		for (int i = 0, j = 0; i != chromosomeNUM; ++i)	// ATTENTION! chromosomeNUM should not larger than chromosomeLEN, or mk may larger than chromosomeLEN and cause "std::out_of_ranger"
 		{
 			if (r(i) < pc)
 			{
@@ -438,9 +481,10 @@ void GA::Solve()
 	check();
 	InitGroup();
 	boost::timer::cpu_timer t;
-	Eigen::Array3d temp;
+	Eigen::ArrayXd temp;
 	int mark = 0;
 
+	setBreakPoint();
 	adapt();
 	maxrec = maxrecord();
 
@@ -468,8 +512,12 @@ void GA::Solve()
 	// outputs
 	cout << endl << "********************************************************" << endl << endl;
 	cout << "  REPORT:          " << endl;
-	cout << "               X1: " << maxrec(1) << endl;
-	cout << "               X2: " << maxrec(2) << endl;
+	for (int i = 1; i <= dimension; ++i)
+	{
+		cout << "               X" << i << ": " << maxrec(i) << endl;
+	}
+//	cout << "               X1: " << maxrec(1) << endl;
+//	cout << "               X2: " << maxrec(2) << endl;
 	cout << "         F(X1,X2): " << maxrec(0) << endl;
 	cout << "             FROM: " << mark << "(TH) GENERATION " << endl;
 	cout << "             TIME: " << t.format(6,"%w SECONDS") << endl;
@@ -488,12 +536,12 @@ void GA::setRange(Eigen::ArrayX2d r)
 
 void GA::check()
 {
-	if (chromosomeNUM >= chromosomeLEN || breakPointPos >= chromosomeLEN)
+	if (chromosomeNUM >= chromosomeLEN /*|| breakPointPos >= chromosomeLEN*/)
 	{
 		cerr << "Error: Invalied values for chromosome! Please reset proper chromosome values." << endl; 
 		exit(0);
 	}
-	if (chromosomeLEN <= 0 || chromosomeNUM <= 0 || breakPointPos <= 0)
+	if (chromosomeLEN <= 0 || chromosomeNUM <= 0 /*|| breakPointPos <= 0*/)
 	{
 		cerr << "Error: Invalied values for chromosome! Please reset proper chromosome values." << endl; 
 		exit(0);
@@ -505,4 +553,22 @@ void GA::check()
 	}
 
 
+}
+
+void GA::setBreakPoint()
+{
+	breakPointStep = std::round(chromosomeLEN / dimension);
+	int bpsfb = 0;		// break point step for the beginning
+	for (int i = 0; i != dimension; ++i)
+	{
+		breakPointPos.push_back(bpsfb);
+		bpsfb += breakPointStep;
+	}
+
+//	bpsfb = 0;
+//	for (int i = 0; i != dimension - 1; ++i)
+//	{
+//		breakPointPosPrev.push_back(bpsfb);
+//		bpsfb += breakPointStep;
+//	}
 }
