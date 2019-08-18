@@ -21,7 +21,7 @@ string toString(const T& t)
 class GA
 {
 	public:
-		GA(int n, double (*obj)(double, double)) : gen(n), objFunc(obj)
+		GA(int n, double (*obj)(vector<double>)) : gen(n), objFunc(obj)
 	{
 //		InitGroup();
 	}
@@ -53,13 +53,13 @@ class GA
 		string vari(string, int);
 		void variation(); 		// variate operator
 
-		void setRange(double, double, double, double);
+		void setRange(Eigen::ArrayX2d);
 
 		// Advanced options
 	//	void configChromosome(int, int, int);
 		void setChromosomeLength(int len){chromosomeLEN = len;}
 		void setChromosomeNumber(int num){chromosomeNUM = num;}
-		void setChromosomeBreakPoint(int pos){breakPointPos = pos;}
+		//void setChromosomeBreakPoint(){breakPointPos = (chromosomeLEN / dimension)}
 		void setCrossOverPossibility(double op){pc = op;}
 		void setVariationPossibility(double vp){pm = vp;}
 
@@ -67,15 +67,21 @@ class GA
 	//	double objFunc(double, double);
 	private:
 		int gen; 			// repeat times
-		double (*objFunc)(double, double); 		// container for the objective function.
+		int dimension = 2;		// 2 by default
+		//vector<double> input;
+		double (*objFunc)(vector<double>); 		// container for the objective function.
 		vector<string> v;		// group
 		Eigen::ArrayXd record{0};	// must init with "{}" not with "()", or it will recognized record as a function! 
 		Eigen::Array3d maxrec;
 
-		double x1begin = -3.0, x1end = 3.0, x2begin = -3.0, x2end = 3.0;
-		int breakPointPos = 18;
+		//double x1begin = -3.0, x1end = 3.0, x2begin = -3.0, x2end = 3.0;
+		Eigen::ArrayX2d range{dimension};
 		int chromosomeLEN = 33;
 		int chromosomeNUM = 20;
+		int breakPointStep = std::round(chromosomeLEN / dimension);
+		int breakPointPos = breakPointStep;
+		int breakPointPosPrev = 0;
+		//int breakPointNUM = dimension - 1;
 		double pm = 0.01;
 		double pc = 0.25;
 };
@@ -171,16 +177,40 @@ void GA::adapt()
 {
 	record.conservativeResize(chromosomeNUM);
 	string temp1; 
-	vector<string> temp2, temp3;
+//	vector<string> temp2, temp3;
+	vector<vector<string> > input;
+	vector<string> tmp;
+	int segment = 1;
+
 	for (int i = 0; i != chromosomeNUM; ++i)
 	{
 		for (int j = 0; j != chromosomeNUM; ++j)
 		{
 			temp1 = v[j];
-			temp2.push_back(temp1.substr(0,breakPointPos - 1));	// stands for x1
-			temp3.push_back(temp1.substr(breakPointPos));	// stands for x2
+			for (int k = 0; k != demension; ++k)
+			{
+				if (segment != dimension)
+				{
+					tmp.push_back(temp1.substr(breakPointPosPrev,breakPointPos - 1));
+					input.push_back(tmp);
+					tmp.clear();
+				}
+				else
+				{
+					tmp.push_back(temp1.substr(breakPointPos));
+					input.push_back(tmp);
+					tmp.clear();
+				}
+				segment += 1;
+				breakPointPosPrev = breakPointPos;
+				breakPointPos += breakPointStep;
+			}
+			//temp2.push_back(temp1.substr(0,breakPointPos - 1));	// stands for x1
+			//temp3.push_back(temp1.substr(breakPointPos));	// stands for x2
 		}
-		record(i) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
+	//	record(i) = (* objFunc)(bin_x(temp2[i],'1'),bin_x(temp3[i],'2'));
+		record(i) = (* objFunc)(bin_x(input));
+		input.clear();
 	}
 	
 }
@@ -200,24 +230,33 @@ Eigen::Array3d GA::maxrecord()
 	return max;
 }
 
-double GA::bin_x(string bin, char opt)
+vector<double> GA::bin_x(vector<vector<string> > inp)
 {
 	double num = 0.0;
-
-	switch (opt)
+	vector<double> ret;
+	vector<string> s;
+	for (int i = 0; i != dimension; ++i)
 	{
-		case '1':
-			//return num = -3.0 + bin2dec(bin) * ((12.1 - (-3.0))/(pow(2,18) - 1));
-			return num = x1begin + bin2dec(bin) * ((x1end - (x1begin))/(pow(2,breakPointPos) - 1));
-			break;
-		case '2':
-			//return num = 4.1 + bin2dec(bin) * ((5.8 - 4.1)/(pow(2,15) - 1));
-			return num = x2begin + bin2dec(bin) * ((x2end - (x2begin))/(pow(2,chromosomeLEN - breakPointPos) - 1));
-			break;
-		default:
-			break;
+		s = inp[i];
+		num = range(i,0) + bin2dec(s[0])  
+		ret.push_back();
 	}
-	return num;
+//	double num = 0.0;
+//
+//	switch (opt)
+//	{
+//		case '1':
+//			//return num = -3.0 + bin2dec(bin) * ((12.1 - (-3.0))/(pow(2,18) - 1));
+//			return num = x1begin + bin2dec(bin) * ((x1end - (x1begin))/(pow(2,breakPointPos) - 1));
+//			break;
+//		case '2':
+//			//return num = 4.1 + bin2dec(bin) * ((5.8 - 4.1)/(pow(2,15) - 1));
+//			return num = x2begin + bin2dec(bin) * ((x2end - (x2begin))/(pow(2,chromosomeLEN - breakPointPos) - 1));
+//			break;
+//		default:
+//			break;
+//	}
+//	return num;
 	
 }
 
@@ -436,12 +475,13 @@ void GA::Solve()
 
 }
 
-void GA::setRange(double x1b, double x1e, double x2b, double x2e)
+void GA::setRange(Eigen::ArrayX2d r)
 {
-	x1begin	= x1b;
-	x1end	= x1e;
-	x2begin	= x2b;
-	x2end	= x2e;
+	range = r;
+//	x1begin	= x1b;
+//	x1end	= x1e;
+//	x2begin	= x2b;
+//	x2end	= x2e;
 }
 
 void GA::check()

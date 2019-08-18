@@ -144,7 +144,7 @@ int main()
 	
 	// real test
 	int gen = 0;
-	GA g{10000,MyobjFunc};
+	GA g{10000,MyobjFunc2};
 	g.setRange(-3.0,12.1,-3.0,12.1);
 	g.setChromosomeLength(44);
 	g.setChromosomeBreakPoint(22);
@@ -175,4 +175,9 @@ double MyobjFunc(double x1, double x2)
 	//return sin(x1) + sin(x2);
 	return x1 * exp(-x1*x1 - x2*x2);
 	//return sqrt(x1*x1+x2*x2);
+}
+
+double MyobjFunc2(vector<double> x) 		// A genius idea!
+{
+	return x[0] * exp(-x[0]*x[0] - x[1]*x[1]);
 }
